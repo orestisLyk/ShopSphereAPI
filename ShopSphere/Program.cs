@@ -1,6 +1,7 @@
 
 using Microsoft.EntityFrameworkCore;
 using ShopSphere.Data;
+using ShopSphere.Security;
 
 namespace ShopSphere
 {
@@ -17,6 +18,8 @@ namespace ShopSphere
 
             builder.Services.AddDbContext<ShopSphereContext>(options =>
                 options.UseNpgsql(connString));
+
+            builder.Services.AddSingleton<IEncryptionUtil, EncryptionUtil>();
 
             builder.Services.AddControllers();
             // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
