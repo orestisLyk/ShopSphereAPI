@@ -1,4 +1,7 @@
 
+using Microsoft.EntityFrameworkCore;
+using ShopSphere.Data;
+
 namespace ShopSphere
 {
     public class Program
@@ -7,7 +10,13 @@ namespace ShopSphere
         {
             var builder = WebApplication.CreateBuilder(args);
 
+            var connString = builder.Configuration.GetConnectionString("DevConnection");
+
+
             // Add services to the container.
+
+            builder.Services.AddDbContext<ShopSphereContext>(options =>
+                options.UseNpgsql(connString));
 
             builder.Services.AddControllers();
             // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
