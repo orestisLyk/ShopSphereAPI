@@ -58,6 +58,9 @@ namespace ShopSphere.Data
                       .HasForeignKey(pi => pi.ProductId);
 
                 entity.Property(p => p.Name).IsRequired().HasMaxLength(100);
+
+                entity.Property(p => p.Sku).IsRequired().HasMaxLength(50);
+                entity.HasIndex(p => p.Sku).IsUnique();
             });
 
             modelBuilder.Entity<Cart>(entity =>
