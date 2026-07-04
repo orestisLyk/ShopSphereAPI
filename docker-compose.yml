@@ -1,0 +1,32 @@
+services:
+  PostgreSQLserver:
+    image: postgres:17
+    container_name: PostgreSQLserver
+    environment:
+      POSTGRES_USER: "${DB_USER}"
+      POSTGRES_PASSWORD: "${DB_USER_PASSWORD}"
+      POSTGRES_DB: "${DB_NAME}"
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:8
+    container_name: shopsphere-redis
+    restart: unless-stopped
+
+    ports:
+      - "6379:6379"
+
+    volumes:
+      - redis-data:/data
+
+volumes:
+  postgres-data:
+  redis-data:
