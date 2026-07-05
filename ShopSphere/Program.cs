@@ -1,4 +1,6 @@
 
+using CloudinaryDotNet;
+using dotenv.net;
 using Microsoft.EntityFrameworkCore;
 using ShopSphere.Data;
 using ShopSphere.Security;
@@ -11,7 +13,15 @@ namespace ShopSphere
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            var connString = builder.Configuration.GetConnectionString("DevConnection");
+            
+
+            //Cloudinary configuration
+            DotEnv.Load(options: new DotEnvOptions(probeForEnv: true));
+            Cloudinary cloudinary = new Cloudinary(Environment.GetEnvironmentVariable("CLOUDINARY_URL"));
+            cloudinary.Api.Secure = true;
+
+            // Get the connection string from environment variables
+            var connString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING");
 
 
             // Add services to the container.
