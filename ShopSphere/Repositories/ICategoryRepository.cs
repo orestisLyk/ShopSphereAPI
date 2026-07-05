@@ -6,5 +6,7 @@ namespace ShopSphere.Repositories
     {
         Task<IEnumerable<Category>> GetCategories();
         Task<Category?> GetCategoryByName(string name);
+        Task<bool> CategoryExistsAsync(int id);
+        Task<bool> CategoryNameExistsAsync(string name);
     }
 }

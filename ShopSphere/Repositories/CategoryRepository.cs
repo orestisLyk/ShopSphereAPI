@@ -17,5 +17,15 @@ namespace ShopSphere.Repositories
         {
             return await context.Categories.FirstOrDefaultAsync(c => c.Name == name);
         }
+
+        public async Task<bool> CategoryExistsAsync(int id)
+        {
+            return await context.Categories.AnyAsync(c => c.Id == id);
+        }
+
+        public async Task<bool> CategoryNameExistsAsync(string name)
+        {
+            return await context.Categories.AnyAsync(c => c.Name == name);
+        }
     }
 }
