@@ -13,7 +13,7 @@ namespace ShopSphere.Service
             _cloudinary = cloudinary;
         }
 
-        public async Task<string> UploadImageAsync(int houseId, IFormFile file)
+        public async Task<string> UploadImageAsync(int productId, IFormFile file)
         {
             if (file == null || file.Length == 0)
             {
@@ -22,7 +22,7 @@ namespace ShopSphere.Service
             var uploadParams = new ImageUploadParams()
             {
                 File = new FileDescription(file.FileName, file.OpenReadStream()),
-                PublicId = $"house_{houseId}/{Guid.NewGuid()}", // Unique identifier for the image
+                PublicId = $"product_{productId}/{Guid.NewGuid()}", // Unique identifier for the image
                 Overwrite = true
             };
             var uploadResult = await _cloudinary.UploadAsync(uploadParams);
