@@ -62,6 +62,12 @@ namespace ShopSphere.Service
 
         public async Task<ProductDetailsDTO?> CreateProductAsync(ProductCreateDTO dto)
         {
+            var category = await unitOfWork.CategoryRepository.GetAsync(dto.CategoryId);
+            if (category == null)
+            {
+                throw new EntityNotFoundException($"Category with ID {dto.CategoryId} not found.");
+            }
+
             var product = mapper.Map<Product>(dto);
 
             string sku = "";
