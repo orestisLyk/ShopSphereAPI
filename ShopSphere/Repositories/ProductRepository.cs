@@ -11,9 +11,12 @@ namespace ShopSphere.Repositories
         {
         }
 
-        public async Task<Product?> GetProductBySkuAsync(string sku)
+        public async Task<Product?> GetProductDetailsBySkuAsync(string sku)
         {
-            return await context.Products.FirstOrDefaultAsync(p => p.Sku == sku);
+            return await context.Products
+                .Include(p => p.Category)
+                .Include(p => p.ProductImages)
+                .FirstOrDefaultAsync(p => p.Sku == sku);
         }
 
         public async Task<Product?> GetProductDetailsAsync(int id)
@@ -51,6 +54,11 @@ namespace ShopSphere.Repositories
                 .Take(pageSize)
                 .ToListAsync();
             return new PaginatedResult<Product>(products, totalCount, pageNumber, pageSize);
+        }
+
+        public async Task<bool> SkuExistsAsync(string sku)
+        {
+            return await context.Products.AnyAsync(p => p.Sku == sku);
         }
     }
 }
