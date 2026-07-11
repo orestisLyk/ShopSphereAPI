@@ -7,7 +7,8 @@
         string FirstName,
         string LastName,
         DateTime CreatedAt,
-        DateTime UpdatedAt
+        DateTime UpdatedAt,
+        string RoleName
     )
     {
     }
