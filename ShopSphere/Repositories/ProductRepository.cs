@@ -16,7 +16,7 @@ namespace ShopSphere.Repositories
             return await context.Products
                 .Include(p => p.Category)
                 .Include(p => p.ProductImages)
-                .FirstOrDefaultAsync(p => p.Sku == sku);
+                .FirstOrDefaultAsync(p => p.Sku == sku && !p.IsDeleted);
         }
 
         public async Task<Product?> GetProductDetailsAsync(int id)
@@ -24,7 +24,7 @@ namespace ShopSphere.Repositories
             return await context.Products
                 .Include(p => p.Category)
                 .Include(p => p.ProductImages)
-                .FirstOrDefaultAsync(p => p.Id == id);
+                .FirstOrDefaultAsync(p => p.Id == id && !p.IsDeleted);
         }
 
         public async Task<PaginatedResult<Product>> GetProductsAsync(int pageNumber, int pageSize)
@@ -34,6 +34,7 @@ namespace ShopSphere.Repositories
 
             var totalCount = await context.Products.CountAsync();
             var products = await context.Products
+                .Where(p => !p.IsDeleted)
                 .OrderBy(p => p.Id)
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
@@ -48,7 +49,7 @@ namespace ShopSphere.Repositories
 
             var totalCount = await context.Products.CountAsync(p => p.CategoryId == categoryId);
             var products = await context.Products
-                .Where(p => p.CategoryId == categoryId)
+                .Where(p => p.CategoryId == categoryId && !p.IsDeleted)
                 .OrderBy(p => p.Id)
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
