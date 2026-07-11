@@ -26,7 +26,6 @@ namespace ShopSphere.Repositories
 
             var users = await context.Users
                 .Include(u => u.Role)
-                    .ThenInclude(r => r.Capabilities)
                 .OrderBy(u => u.Id)
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
