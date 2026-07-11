@@ -18,6 +18,11 @@ namespace ShopSphere.Configuration
             CreateMap<Category, CategoryReadOnlyDTO>();
             CreateMap<CategoryCreateDTO, Category>();
             CreateMap<CategoryUpdateDTO, Category>();
+
+            CreateMap<UserRegisterDTO, User>();
+            CreateMap<UserUpdateDTO, User>();
+            CreateMap<User, UserReadOnlyDTO>()
+                .ForMember(dest => dest.RoleName, opt => opt.MapFrom(src => src.Role.Name));
         }
     }
 }
