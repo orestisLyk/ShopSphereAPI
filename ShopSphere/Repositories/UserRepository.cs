@@ -39,5 +39,15 @@ namespace ShopSphere.Repositories
                 PageSize = pageSize
             };
         }
+
+        public async Task<bool> UsernameExistsAsync(string username)
+        {
+            return await context.Users.AnyAsync(u => u.Username == username);
+        }
+
+        public async Task<bool> EmailExistsAsync(string email)
+        {
+            return await context.Users.AnyAsync(u => u.Email == email);
+        }
     }
 }

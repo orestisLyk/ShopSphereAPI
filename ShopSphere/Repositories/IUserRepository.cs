@@ -7,5 +7,8 @@ namespace ShopSphere.Repositories
     {
         Task<User?> GetUserByUsername(string username);
         Task<PaginatedResult<User>> GetUsersAsync(int pageNumber, int pageSize);
+
+        Task<bool> UsernameExistsAsync(string username);
+        Task<bool> EmailExistsAsync(string email);
     }
 }
