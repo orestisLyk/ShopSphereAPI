@@ -54,6 +54,11 @@ namespace ShopSphere.Service
 
         public async Task<PaginatedResult<ProductMinimalDTO>> GetProductsByCategoryAsync(int categoryId, int pageNumber, int pageSize)
         {
+            var category = await unitOfWork.CategoryRepository.GetAsync(categoryId);
+            if(category == null)
+            {
+                throw new EntityNotFoundException($"{categoryId} is not a category");
+            }
             var paginatedProducts = await unitOfWork.ProductRepository.GetProductsByCategoryAsync(categoryId, pageNumber, pageSize);
             var productMinimalDTOs = mapper.Map<List<ProductMinimalDTO>>(paginatedProducts.Items);
             logger.LogInformation("Retrieved products for category ID {CategoryId} on page {PageNumber} with page size {PageSize}", categoryId, pageNumber, pageSize);
@@ -92,6 +97,13 @@ namespace ShopSphere.Service
             {
                 throw new EntityNotFoundException($"Product with ID {id} not found.");
             }
+
+            var category = await unitOfWork.CategoryRepository.GetAsync(dto.CategoryId);
+            if (category == null)
+            {
+                throw new EntityNotFoundException($"Category with ID {dto.CategoryId} not found.");
+            }
+
             mapper.Map(dto, product);
             await unitOfWork.SaveChangesAsync();
             var productDetailsDTO = mapper.Map<ProductDetailsDTO>(product);
