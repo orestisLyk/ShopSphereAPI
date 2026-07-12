@@ -19,13 +19,15 @@ namespace ShopSphere.Repositories
         {
             return await context.Carts
                 .Include(c => c.CartItems)
+                .ThenInclude(ci => ci.Product)
                 .FirstOrDefaultAsync(c => c.UserId == userId);
         }
 
         public async Task<CartItem?> GetCartItemAsync(int cartId, int productId)
         {
             return await context.CartItems
-                .FirstOrDefaultAsync(ci => ci.CartId == cartId && ci.ProductId == productId);
+                .Include(ci => ci.Product)
+                .FirstOrDefaultAsync(ci => ci.CartId == cartId && ci.ProductId == productId && !ci.Product.IsDeleted);
         }
 
         public async Task<bool> CartExistsForUserAsync(int userId)
