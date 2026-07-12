@@ -4,6 +4,7 @@ using dotenv.net;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
+using ShopSphere.Configuration;
 using ShopSphere.Data;
 using ShopSphere.Helpers;
 using ShopSphere.Repositories;
@@ -104,6 +105,8 @@ namespace ShopSphere
 
             builder.Services.AddSingleton<IEncryptionUtil, EncryptionUtil>();
             builder.Services.AddRepositories();
+
+            builder.Services.AddAutoMapper(cfg => { }, typeof(MapperConfig).Assembly);
 
             builder.Services.AddControllers();
 
