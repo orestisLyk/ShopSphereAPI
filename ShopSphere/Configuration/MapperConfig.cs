@@ -23,6 +23,17 @@ namespace ShopSphere.Configuration
             CreateMap<UserUpdateDTO, User>();
             CreateMap<User, UserReadOnlyDTO>()
                 .ForMember(dest => dest.RoleName, opt => opt.MapFrom(src => src.Role.Name));
+
+            CreateMap<CartItemCreateDTO, CartItem>();
+            CreateMap<CartItemUpdateDTO, CartItem>();   
+            CreateMap<CartItem, CartItemReadOnlyDTO>()
+                .ForMember(dest => dest.ProductName, opt => opt.MapFrom(src => src.Product.Name))
+                .ForMember(dest => dest.Sku, opt => opt.MapFrom(src => src.Product.Sku))
+                .ForMember(dest => dest.ProductPrice, opt => opt.MapFrom(src => src.Product.Price))
+                .ForMember(dest => dest.TotalPrice, opt => opt.MapFrom(src => src.Product.Price * src.Quantity));
+
+            CreateMap<Cart, CartReadOnlyDTO>()
+                .ForMember(dest => dest.CartItems, opt => opt.MapFrom(src => src.CartItems));
         }
     }
 }
