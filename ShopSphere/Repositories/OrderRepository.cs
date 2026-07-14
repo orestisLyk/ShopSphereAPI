@@ -17,6 +17,7 @@ namespace ShopSphere.Repositories
             return await context.Orders
                 .Include(o => o.OrderItems)
                     .ThenInclude(oi => oi.Product)
+                    .Include(o => o.Payment)
                 .FirstOrDefaultAsync(o => o.Id == id);
         }
 
