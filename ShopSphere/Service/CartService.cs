@@ -33,7 +33,7 @@ namespace ShopSphere.Service
             }
 
             var product = await unitOfWork.ProductRepository.GetAsync(dto.ProductId);
-            if (product == null)
+            if (product == null || product.IsDeleted)
             {
                 throw new EntityNotFoundException($"Product with ID {dto.ProductId} not found.");
             }
