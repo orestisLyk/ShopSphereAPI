@@ -11,6 +11,7 @@ using ShopSphere.Repositories;
 using ShopSphere.Security;
 using ShopSphere.Service;
 using System.Reflection;
+using Stripe;
 
 namespace ShopSphere
 {
@@ -27,8 +28,29 @@ namespace ShopSphere
             Cloudinary cloudinary = new Cloudinary(Environment.GetEnvironmentVariable("CLOUDINARY_URL"));
             cloudinary.Api.Secure = true;
 
-            // Get the connection string from environment variables
-            var connString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING");
+            //Configure Stripe settings
+            builder.Services.AddSingleton<IStripeClient>(_ =>
+            {
+                var secretKey = Environment.GetEnvironmentVariable("STRIPE_SECRET_KEY");
+
+                if(string.IsNullOrWhiteSpace(secretKey))
+                {
+                    throw new InvalidOperationException("Stripe secret key is not configured.");
+                }
+
+                return new StripeClient(secretKey);
+            });
+
+            builder.Services.AddSingleton<StripeSettings>(new StripeSettings
+            {
+                SecretKey = Environment.GetEnvironmentVariable("STRIPE_SECRET_KEY") ?? string.Empty,
+                PublishableKey = Environment.GetEnvironmentVariable("STRIPE_PUBLISHABLE_KEY") ?? string.Empty,
+                WebhookSecret = Environment.GetEnvironmentVariable("STRIPE_WEBHOOK_SECRET") ?? string.Empty,
+                Currency = Environment.GetEnvironmentVariable("STRIPE_CURRENCY") ?? "eur"
+            });
+
+                // Get the connection string from environment variables
+                var connString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING");
 
             //Configure JWT authentication
             var jwtSettings = builder.Configuration.GetSection("Jwt");
@@ -112,8 +134,11 @@ namespace ShopSphere
 
             builder.Services.AddScoped<IImageStorageService,CloudinaryImageStorageService>();
             
+            builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 
             var app = builder.Build();
+
+            app.UseExceptionHandler();
 
             if (app.Environment.IsDevelopment())
             {
