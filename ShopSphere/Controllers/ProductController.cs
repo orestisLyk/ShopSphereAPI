@@ -85,5 +85,20 @@ namespace ShopSphere.Controllers
             var products = await productService.GetProductsByCategoryAsync(categoryId, page, size);
             return Ok(products);
         }
+
+        [HttpPost]
+        [Authorize(Roles = "Admin")]
+        [ProducesResponseType(typeof(ProductDetailsDTO), StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> CreateProductAsync([FromBody] ProductCreateDTO productCreateDTO)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var createdProduct = await productService.CreateProductAsync(productCreateDTO);
+            return CreatedAtAction(nameof(GetProductByIdAsync), new { id = createdProduct.Id }, createdProduct);
+        }
     }
 }
