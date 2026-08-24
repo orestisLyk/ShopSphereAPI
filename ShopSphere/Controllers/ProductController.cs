@@ -105,5 +105,50 @@ namespace ShopSphere.Controllers
             var createdProduct = await productService.CreateProductAsync(productCreateDTO);
             return CreatedAtAction(nameof(GetProductByIdAsync), new { id = createdProduct.Id }, createdProduct);
         }
+
+        /// <summary>
+        /// Updates an existing product.
+        /// </summary>
+        /// <param name="id">The ID of the product to update.</param>
+        /// <param name="productUpdateDTO">The updated product information.</param>
+        /// <returns>The updated product.</returns>
+        [HttpPut("{id}")]
+        [Authorize(Roles = "Admin")]
+        [ProducesResponseType(typeof(ProductDetailsDTO), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> UpdateProductAsync(int id, [FromBody] ProductUpdateDTO productUpdateDTO)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var updatedProduct = await productService.UpdateProductAsync(id, productUpdateDTO);
+            if (updatedProduct == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(updatedProduct);
+        }
+
+        /// <summary>
+        /// Deletes a product by its ID.
+        /// </summary>
+        /// <param name="id">The ID of the product to delete.</param>
+        /// <returns>No content if the deletion was successful.</returns>
+        [HttpDelete("{id}")]
+        [Authorize(Roles = "Admin")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> DeleteProductAsync(int id)
+        {
+            await productService.DeleteProductAsync(id);
+            
+            return NoContent();
+        }
+
+
     }
 }
