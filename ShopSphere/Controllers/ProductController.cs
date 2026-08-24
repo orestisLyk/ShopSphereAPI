@@ -86,6 +86,11 @@ namespace ShopSphere.Controllers
             return Ok(products);
         }
 
+        /// <summary>
+        /// Creates a new product.
+        /// </summary>
+        /// <param name="productCreateDTO">The product to create.</param>
+        /// <returns>The created product.</returns>
         [HttpPost]
         [Authorize(Roles = "Admin")]
         [ProducesResponseType(typeof(ProductDetailsDTO), StatusCodes.Status201Created)]
