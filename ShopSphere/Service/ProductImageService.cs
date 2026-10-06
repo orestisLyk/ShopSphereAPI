@@ -21,7 +21,7 @@ namespace ShopSphere.Service
             this.imageStorageService = imageStorageService;
         }
 
-        public async Task AddImageAsync(int productId, ProductImageCreateDTO image)
+        public async Task<ProductImageReadDTO> AddImageAsync(int productId, ProductImageCreateDTO image)
         {
             var product = await unitOfWork.ProductRepository.GetProductDetailsAsync(productId);
             if (product == null)
@@ -35,6 +35,8 @@ namespace ShopSphere.Service
 
             await unitOfWork.ProductImageRepository.AddAsync(imageEntity);
             await unitOfWork.SaveChangesAsync();
+
+            return new ProductImageReadDTO(imageEntity.Id, imageEntity.ImageUrl, imageEntity.ProductId);
         }
 
         public async Task DeleteImageAsync(int imageId)
@@ -48,6 +50,19 @@ namespace ShopSphere.Service
             imageEntity.IsDeleted = true;
             imageEntity.DeletedAt = DateTime.UtcNow;
             await unitOfWork.SaveChangesAsync();
+        }
+
+        public async Task<IEnumerable<ProductImageReadDTO>> GetImagesByProductIdAsync(int productId)
+        {
+            var images = await unitOfWork.ProductImageRepository.GetImagesByProductIdAsync(productId);
+            return images.Select(pi => new ProductImageReadDTO(pi.Id, pi.ImageUrl, pi.ProductId));
+        }
+
+        public async Task<ProductImageReadDTO?> GetImageByIdAsync(int imageId)
+        {
+            var pi = await unitOfWork.ProductImageRepository.GetImageByIdAsync(imageId);
+            if (pi == null) return null;
+            return new ProductImageReadDTO(pi.Id, pi.ImageUrl, pi.ProductId);
         }
     }
 }

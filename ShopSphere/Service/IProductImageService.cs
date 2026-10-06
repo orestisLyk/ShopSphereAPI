@@ -4,7 +4,9 @@ namespace ShopSphere.Service
 {
     public interface IProductImageService
     {
-        Task AddImageAsync(int productId, ProductImageCreateDTO image);
+        Task<ProductImageReadDTO> AddImageAsync(int productId, ProductImageCreateDTO image);
         Task DeleteImageAsync(int imageId);
+        Task<IEnumerable<ProductImageReadDTO>> GetImagesByProductIdAsync(int productId);
+        Task<ProductImageReadDTO?> GetImageByIdAsync(int imageId);
     }
 }
