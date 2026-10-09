@@ -4,6 +4,8 @@ using ShopSphere.DTO;
 using ShopSphere.Exceptions;
 using ShopSphere.Model;
 using ShopSphere.Repositories;
+using ShopSphere.Cache;
+using System;
 
 namespace ShopSphere.Service
 {
@@ -12,23 +14,38 @@ namespace ShopSphere.Service
         private readonly IUnitOfWork unitOfWork;
         private readonly IMapper mapper;
         private readonly ILogger<ProductService> logger;
+        private readonly ICacheService cacheService;
 
-        public ProductService(IUnitOfWork unitOfWork, IMapper mapper, ILogger<ProductService> logger)
+        public ProductService(IUnitOfWork unitOfWork, IMapper mapper, ILogger<ProductService> logger, ICacheService cacheService)
         {
             this.unitOfWork = unitOfWork;
             this.mapper = mapper;
             this.logger = logger;
+            this.cacheService = cacheService;
         }
 
         public async Task<ProductDetailsDTO?> GetProductDetailsByIdAsync(int id)
         {
+            var cacheKey = $"product:{id}:v1";
+            var cached = await cacheService.GetAsync<ProductDetailsDTO>(cacheKey);
+            if (cached != null)
+            {
+                logger.LogDebug("Cache hit for product {ProductId}", id);
+                return cached;
+            }
+
             var product = await unitOfWork.ProductRepository.GetProductDetailsAsync(id);
             if (product == null)
             {
                 throw new EntityNotFoundException($"Product with ID {id} not found.");
             }
+
             var productDetailsDTO = mapper.Map<ProductDetailsDTO>(product);
             logger.LogInformation("Retrieved product details for product ID {ProductId}", id);
+
+            // cache for 15 minutes
+            await cacheService.SetAsync(cacheKey, productDetailsDTO, TimeSpan.FromMinutes(15));
+
             return productDetailsDTO;
         }
 
@@ -87,6 +104,10 @@ namespace ShopSphere.Service
             await unitOfWork.SaveChangesAsync();
             var productDetailsDTO = mapper.Map<ProductDetailsDTO>(product);
             logger.LogInformation("Created new product with ID {ProductId}", product.Id);
+
+            var cacheKey = $"product:{product.Id}:v1";
+            await cacheService.SetAsync(cacheKey, productDetailsDTO, TimeSpan.FromMinutes(15));
+
             return productDetailsDTO;
         }
 
@@ -108,6 +129,10 @@ namespace ShopSphere.Service
             await unitOfWork.SaveChangesAsync();
             var productDetailsDTO = mapper.Map<ProductDetailsDTO>(product);
             logger.LogInformation("Updated product with ID {ProductId}", product.Id);
+
+            var cacheKey = $"product:{product.Id}:v1";
+            await cacheService.SetAsync(cacheKey, productDetailsDTO, TimeSpan.FromMinutes(15));
+
             return productDetailsDTO;
         }
 
@@ -121,6 +146,10 @@ namespace ShopSphere.Service
             product.IsDeleted = true;
             product.DeletedAt = DateTime.UtcNow;
             await unitOfWork.SaveChangesAsync();
+
+            var cacheKey = $"product:{product.Id}:v1";
+            await cacheService.RemoveAsync(cacheKey);
+
             logger.LogInformation("Deleted product with ID {ProductId}", product.Id);
         }
 

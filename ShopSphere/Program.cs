@@ -133,7 +133,26 @@ namespace ShopSphere
             builder.Services.AddControllers();
 
             builder.Services.AddScoped<IImageStorageService,CloudinaryImageStorageService>();
-            
+
+            // Redis cache configuration - prefer REDIS_CONNECTION env var, fallback to config
+            var redisConn = Environment.GetEnvironmentVariable("REDIS_CONNECTION") ?? builder.Configuration["Redis:Connection"];
+            if (!string.IsNullOrWhiteSpace(redisConn))
+            {
+                builder.Services.AddStackExchangeRedisCache(options =>
+                {
+                    options.Configuration = redisConn;
+                    options.InstanceName = "shopsphere:";
+                });
+            }
+            else
+            {
+                // Fallback to in-memory distributed cache for environments without Redis
+                builder.Services.AddDistributedMemoryCache();
+            }
+
+            // Cache wrapper
+            builder.Services.AddSingleton<ShopSphere.Cache.ICacheService, ShopSphere.Cache.DistributedCacheService>();
+
             builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 
             var app = builder.Build();
